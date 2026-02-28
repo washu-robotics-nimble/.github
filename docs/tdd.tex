@@ -132,6 +132,27 @@ Additional VLM/LLM for Data Preprocessing: Local Qwen3-4B instance,
 Programming Languages: Mainly Python, JSON for data.
 Compute: RoboServer
 
+\subsection{Extension of Writing Range with a Linear Actuator}
+
+Writing text is difficult, as the phrase `hello world this is a cool sentence` with the WidowX arm can only be written in the range of action given by the robot and its camera. A linear actuator provides a `sliding window' over the writing surface, enabling arbitrarily long text output.
+
+\subsubsection*{Text Planning}
+
+Before any motion occurs, the full spatial layout of the text should be pre-computed:
+\begin{itemize}
+  \item Determine character width and inter-character spacing in physical units (cm).
+  \item Map the full string to an absolute coordinate sequence along the writing axis.
+  \item Determine the total horizontal distance required.
+\end{itemize}
+
+\subsubsection*{Text Chunking by Reachability}
+
+Given the current position of the arm, a \textbf{range of action} is defined, which is the zone the writing tool can write in at the current position. The input text to the start of the program is greedily chunked, meaning that characters are grouped until the next character would fall outside the window. Chunk boundaries are placed \emph{between characters}, but should never be chunked mid-character.
+
+\subsubsection*{Slide by Inference on a Chunk}
+
+For each chunk, the VLA (NORA 1.5) executes the writing motions normally. When the chunk is complete, the actuator must activate, moving X distance based on where the next chunk is. Actuator movement is intentionally seperate from VLA inference, as it is purely physical and does not need to be learned. After sliding, a brief re-anchoring step determines where the last written character ended to determine where the arm should resume movement. The VLA is then re-prompted with the next chunk of text.
+
 \subsection{High-Level Overview (HLD)}
 List all logical system components:
 \begin{itemize}
