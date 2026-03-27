@@ -47,6 +47,54 @@
 \newpage
 
 %----------------------------
+\section*{Action Items}
+% This is to be removed potentially on completion of this document.
+\subsection*{Software}
+
+\begin{enumerate}
+
+  \item \textbf{VNC Setup} \\
+  Set up VNC for those who have not yet connected to the server's desktop environment (a graphical environment to observe what is happening inside the Linux container). Only one person should connect at a time via TigerVNC. Everyone who has not completed this setup should prioritize it; all others should focus on the tasks below.
+
+  \item \textbf{Branch Merge} \\
+  Migrate correct code from Anling's branch/script/environment to the main branch. Development can continue on this branch going forward.
+
+  \item \textbf{LeRobot Dataset Collection} \\
+  Collect a \texttt{LeRobotDataset} for eventual VLA fine-tuning. This is the highest priority task.
+  \begin{itemize}
+    \item Data points will be collected through Isaac Lab as recordings of the robot performing action $X$ given camera observation $Y$ and text input $Z$. Once collection is complete (HDF5 format), the dataset must be converted to \texttt{LeRobotDataset} format, as required by NORA 1.5 fine-tuning.
+    \item Prior to collection, the Isaac Lab virtual environment must be configured to match the physical environment as closely as possible, including arm attachments (Logitech camera), and environmental objects (whiteboard, marker holder, etc.).
+    \item The raw HDF5 dataset will first be released publicly on HuggingFace, followed by the converted \texttt{LeRobotDataset}.
+  \end{itemize}
+
+  \item \textbf{VLA Fine-Tuning} \\
+  Fine-tune NORA 1.5 for handwriting tasks. Zero-shot inference of the NORA 1.5 VLA has been observed to not perform well in this domain, so we will fine-tune it.
+  \begin{itemize}
+    \item NORA 1.5's pretraining data likely contains no robotic writing examples, making fine-tuning essential for this specific scenario of writing.
+    \item Fine-tuning will use the HuggingFace \texttt{LeRobotDataset} via the fine-tuning script provided in the NORA 1.5 GitHub repository.
+    \item The fine-tuned VLA will be released publicly on HuggingFace. This work has potential for academic writing, like a technical white paper or report given the project's structure. The fine-tuned model could also be shared on social media to gauge interest from researchers and practitioners. A faculty collaborator may be worth pursuing in the future after we have completed this project.
+  \end{itemize}
+
+\end{enumerate}
+
+\subsection*{Integration}
+
+\begin{enumerate}
+
+  \item \textbf{Arm and Camera Wiring} \\
+  Physical wiring of the arm and camera into the compute environment must be established and discussed with the team. Since the Roboserver will be running VLA inference and all associated scripts, a reliable communication channel between the arm, camera, and Roboserver is required.
+
+  \item \textbf{Physical Environment Setup} \\
+  The physical environment of the arm must match the Isaac Lab virtual environment used for data collection and fine-tuning as closely as possible. Mismatches between virtual and physical environments are a primary source of performance degradation.
+
+  \item \textbf{Linear Actuator Integration} (\textit{in progress}) \\
+  A linear actuator enables the arm to traverse the writing surface horizontally, extending its effective writing range. Without this, the robot cannot produce arbitrarily long text on a surface larger than its static range of motion.
+
+\end{enumerate}
+\newpage
+%----------------------------
+
+%----------------------------
 \section{Overview}
 %Describe the purpose of this document and its intended audience.  
 %Mention any prerequisite knowledge required before reading.  
