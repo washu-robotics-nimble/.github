@@ -48,22 +48,16 @@
 
 %----------------------------
 \section*{Action Items}
-% This is to be removed potentially on completion of this document.
+% This is to be removed on completion of this document.
 \subsection*{Software}
 
 \begin{enumerate}
 
-  \item \textbf{VNC Setup} \\
-  Set up VNC for those who have not yet connected to the server's desktop environment (a graphical environment to observe what is happening inside the Linux container). Only one person should connect at a time via TigerVNC. Everyone who has not completed this setup should prioritize it; all others should focus on the tasks below.
-
-  \item \textbf{Branch Merge} \\
-  Migrate correct code from Anling's branch/script/environment to the main branch. Development can continue on this branch going forward.
-
   \item \textbf{LeRobot Dataset Collection} \\
   Collect a \texttt{LeRobotDataset} for eventual VLA fine-tuning. This is the highest priority task.
   \begin{itemize}
-    \item Data points will be collected through Isaac Lab as recordings of the robot performing action $X$ given camera observation $Y$ and text input $Z$. Once collection is complete (HDF5 format), the dataset must be converted to \texttt{LeRobotDataset} format, as required by NORA 1.5 fine-tuning.
-    \item Prior to collection, the Isaac Lab virtual environment must be configured to match the physical environment as closely as possible, including arm attachments (Logitech camera), and environmental objects (whiteboard, marker holder, etc.).
+    \item Data points will be collected through Isaac Lab or the Trossen Data Collection Framework.
+    \item Prior to collection, the Isaac Lab virtual environment / physical environment must be configured to match the physical environment as closely as possible, including arm attachments (Logitech camera), and environmental objects (whiteboard, marker holder, etc.).
     \item The raw HDF5 dataset will first be released publicly on HuggingFace, followed by the converted \texttt{LeRobotDataset}.
   \end{itemize}
 
@@ -99,28 +93,27 @@
 %Describe the purpose of this document and its intended audience.  
 %Mention any prerequisite knowledge required before reading.  
 %Specify whether it targets a technical or non-technical audience.
-The purpose of this document is to present the technical design of a system that enables a robotic arm to learn and perform handwriting tasks for basic sentences using reinforcement learning (RL). \\\\
+The purpose of this document is to present the technical design of a system that enables a robotic arm to learn and perform handwriting tasks in a physical environment for basic sentences using reinforcement learning (RL). \\\\
 This document is intended for a technical audience with a background in computer science, robotics, or machine learning. Non-technical readers may find high-level summaries useful but should refer to supplementary documentation at the end of this document for background on the underlying mechanisms employed.
 \newpage
 %----------------------------
 \section{Problem}
 
-Current robot arms used for writing tasks operate with \textbf{static, pre-programmed motions}. Each specific writing task---whether it's writing a particular sentence, drawing a shape, or creating a signature---requires its own custom motion program. This approach has several critical limitations:
+Current robot arms used for writing tasks operate with \textbf{static, pre-programmed motions}. Each specific writing task requires its own custom motion program, which has several critical limitations:
 
 \subsection{The Core Problem}
 
-When a robot needs to write something new, engineers must:
-\begin{enumerate}
+If a robot needs to write something new, engineers must:
+\begin{itemize}
     \item Manually program the exact trajectory for each letter or word.
     \item Hard-code the sequence of movements.
     \item Test, refine, and repeat this entire process for every new writing task.
-\end{enumerate}
-
-A \textbf{dynamic robot arm} that can generalize its writing capabilities would:
+\end{itemize}
+An autonomous robot that generalizes its writing capabilities would:
 \begin{itemize}
-    \item \textbf{Scale efficiently}: Write any arbitrary text without reprogramming.
-    \item \textbf{Adapt to variations}: Handle different sizes and styles of text.
-    \item \textbf{Learn from examples}: Improve through demonstration rather than explicit programming.
+    \item Scale efficiently: Write any arbitrary text without reprogramming.
+    \item Adapt to variations: Handle different sizes and styles of text.
+    \item Learn from examples: Improve through demonstration rather than explicit programming.
 \end{itemize}
 
 \subsection{The Core Goal}
@@ -131,13 +124,6 @@ The goal is to develop a robot writing system that can:
     \item Dynamically generate appropriate writing motions.
     \item Execute smooth, legible handwriting without pre-programmed trajectories for each specific string.
 \end{itemize}
-\newpage
-%----------------------------
-\section{Tenets}
-TODO!
-List the key principles or beliefs guiding the design decisions.  
-Tenets help align teams and establish common ground on critical design questions.
-talk to team about this
 \newpage
 %----------------------------
 \section{Requirements}
