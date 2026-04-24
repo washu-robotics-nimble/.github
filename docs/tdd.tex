@@ -180,6 +180,71 @@ Additional VLM/LLM for Data Preprocessing: Local Qwen3-4B instance,
 Programming Languages: Mainly Python, JSON for data.
 Compute: RoboServer
 
+\subsection{VLA Dataset and Training}
+
+During operation, the VLA will be asked by the user to write a sentence or word in the format of \texttt{Write `THING\_TO\_WRITE'}.
+
+\begin{description}
+  \item[Q: How do we ensure the VLA can understand all text inputs?]
+  We need to collect lots of diverse data.
+
+  \item[Q: How do we collect diverse data for the text of a sentence?]
+  We need to learn how to write characters in that language so that text can be broken down into atomic units.
+\end{description}
+
+For collecting diverse data points for writing English text, we define a control script to write characters given their stroke-by-stroke physical definitions. Each data point for a character contains:
+
+\begin{enumerate}
+  \item The writing instruction: \texttt{Write `character'}
+  \item The vision: camera input captured before writing that stroke
+  \item The stroke movement: the arm trajectory required to draw the next stroke of the desired character
+\end{enumerate}
+
+\begin{description}
+  \item[Q: Why not just train on words?]
+  VLAs have sparse rewards, only receiving a reward signal at the end of the sequence. Writing a word takes many timesteps. More fundamentally, the VLA outputs a single 6-DOF action vector per inference pass---there is no single action that writes a word. Writing even a short word requires hundreds of sequential arm poses, plus pen-lifts within characters (e.g., the dot in `i'), between characters, and between words. Training at the character level avoids all of these issues.
+\end{description}
+
+\subsection{Fine-Tuned VLA Inference}
+
+A sentence is decomposed hierarchically:
+\begin{itemize}
+  \item A \textbf{sentence} decomposes into words, separated by scripted spaces.
+  \item A \textbf{word} decomposes into characters, separated by scripted smaller spaces.
+  \item A \textbf{character} decomposes into strokes. A \textbf{stroke} is the atomic unit of VLA inference.
+\end{itemize}
+
+For example, `A' has 3 strokes and `I' has 1 stroke. The VLA performs one inference pass per stroke, and the stroke count per character is physically defined in code, so the system always knows exactly how many inference passes to run. Each inference pass receives:
+\begin{enumerate}
+  \item The writing instruction for the \emph{character}: \texttt{Write `character'}
+  \item The vision: camera input captured before executing that stroke
+  \item Output: the stroke movement vector used to actuate the arm
+\end{enumerate}
+
+Pen-lifts and repositioning between characters and words are \textbf{scripted}, not learned, so they do not require VLA inference.
+
+\subsubsection*{Control Flow}
+
+\begin{verbatim}
+"Write 'hello'"
+-> parse -> ['h', 'e', 'l', 'l', 'o']
+-> for each character:
+   -> look up stroke count in physically defined constant
+   -> run VLA inference stroke_count times
+   -> scripted pen-lift + reposition to next character start position
+-> done
+
+"Write 'hello world'"
+-> parse -> [['h','e','l','l','o'], ['w','o','r','l','d']]
+-> for each word:
+   -> for each character:
+      -> look up stroke count in physically defined constant
+      -> run VLA inference stroke_count times
+      -> scripted pen-lift + reposition to next character start position
+   -> scripted larger pen-lift and reposition for word gap
+-> done
+\end{verbatim}
+
 \subsection{Extension of Writing Range with a Linear Actuator}
 
 Writing text is difficult, as the phrase `hello world this is a cool sentence` with the WidowX arm can only be written in the range of action given by the robot and its camera. A linear actuator provides a `sliding window' over the writing surface, enabling arbitrarily long text output.
