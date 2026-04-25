@@ -191,6 +191,27 @@ For collecting diverse data points for writing English text, we define a control
   VLAs have sparse rewards, only receiving a reward signal at the end of the sequence. Writing a word takes many timesteps. More fundamentally, the VLA outputs a single 6-DOF action vector per inference pass---there is no single action that writes a word. Writing even a short word requires hundreds of sequential arm poses, plus pen-lifts within characters (e.g., the dot in `i'), between characters, and between words. Training at the character level avoids all of these issues.
 \end{description}
 
+\subsubsection*{Control Flow}
+
+We can write each character given their stroke-by-stroke physical definitions, and collect their datapoints (for each stroke of a given character) through the Trossen Data Collection framework.
+
+\begin{verbatim}
+"Write 'A'"
+-> parse -> ['A']
+-> for each character:
+   -> look up stroke count, physical motions in defined constant
+   -> for each stroke in range(stroke_count):
+      -> start recording an 'episode' for data collection
+      -> collect current frame that the robot sees
+      -> draw stroke using trossen library
+      -> collect the 6-DOF tuple / action that is used to draw the stroke
+      -> the data point is the writing instruction, frame, action (stroke)
+   -> scripted pen-lift + reposition to next character start position
+-> done
+\end{verbatim}
+
+The dataset collection and the 
+
 \subsection{Fine-Tuned VLA Inference}
 
 A sentence is decomposed hierarchically:
@@ -216,7 +237,7 @@ Pen-lifts and repositioning between characters and words are \textbf{scripted}, 
 -> parse -> ['h', 'e', 'l', 'l', 'o']
 -> for each character:
    -> look up stroke count in physically defined constant
-   -> run VLA inference stroke_count times
+   -> run VLA inference stroke_count times WITH fine-tuned model
    -> scripted pen-lift + reposition to next character start position
 -> done
 
@@ -225,7 +246,7 @@ Pen-lifts and repositioning between characters and words are \textbf{scripted}, 
 -> for each word:
    -> for each character:
       -> look up stroke count in physically defined constant
-      -> run VLA inference stroke_count times
+      -> run VLA inference stroke_count times WITH fine-tuned model
       -> scripted pen-lift + reposition to next character start position
    -> scripted larger pen-lift and reposition for word gap
 -> done
