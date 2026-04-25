@@ -56,16 +56,15 @@
   \item \textbf{LeRobot Dataset Collection} \\
   Collect a \texttt{LeRobotDataset} for eventual VLA fine-tuning. This is the highest priority task.
   \begin{itemize}
-    \item Data points will be collected through Isaac Lab or the Trossen Data Collection Framework.
-    \item Prior to collection, the Isaac Lab virtual environment / physical environment must be configured to match the physical environment as closely as possible, including arm attachments (Logitech camera), and environmental objects (whiteboard, marker holder, etc.).
-    \item The raw HDF5 dataset will first be released publicly on HuggingFace, followed by the converted \texttt{LeRobotDataset}.
+    \item Please follow the notes in the Architecture section about dataset collection.
+    \item Prior to collection, the environment must be configured, including arm attachments (Logitech camera), and environmental objects (whiteboard, marker holder, etc.).
   \end{itemize}
 
   \item \textbf{VLA Fine-Tuning} \\
   Fine-tune NORA 1.5 for handwriting tasks. Zero-shot inference of the NORA 1.5 VLA has been observed to not perform well in this domain, so we will fine-tune it.
   \begin{itemize}
     \item NORA 1.5's pretraining data likely contains no robotic writing examples, making fine-tuning essential for this specific scenario of writing.
-    \item Fine-tuning will use the HuggingFace \texttt{LeRobotDataset} via the fine-tuning script provided in the NORA 1.5 GitHub repository.
+    \item Fine-tuning will use a HuggingFace \texttt{LeRobotDataset} via the fine-tuning script provided in the NORA 1.5 GitHub repository.
     \item The fine-tuned VLA will be released publicly on HuggingFace. This work has potential for academic writing, like a technical white paper or report given the project's structure. The fine-tuned model could also be shared on social media to gauge interest from researchers and practitioners. A faculty collaborator may be worth pursuing in the future after we have completed this project.
   \end{itemize}
 
@@ -79,10 +78,10 @@
   Physical wiring of the arm and camera into the compute environment must be established and discussed with the team. Since the Roboserver will be running VLA inference and all associated scripts, a reliable communication channel between the arm, camera, and Roboserver is required.
 
   \item \textbf{Physical Environment Setup} \\
-  The physical environment of the arm must match the Isaac Lab virtual environment used for data collection and fine-tuning as closely as possible. Mismatches between virtual and physical environments are a primary source of performance degradation.
+  The physical environment of the arm must be configured for data collection and fine-tuning as closely as possible. Mismatches between virtual and physical environments are a primary source of performance degradation.
 
   \item \textbf{Linear Actuator Integration} (\textit{in progress}) \\
-  A linear actuator enables the arm to traverse the writing surface horizontally, extending its effective writing range. Without this, the robot cannot produce arbitrarily long text on a surface larger than its static range of motion.
+  A linear actuator enables the arm to traverse the writing surface horizontally, extending its effective writing range. Without this, the robot cannot produce arbitrarily long text on a surface larger than its static range of motion. There will need to be discussion of how communication will travel both ways through the RoboServer.
 
 \end{enumerate}
 \newpage
@@ -90,10 +89,9 @@
 
 %----------------------------
 \section{Overview}
-%Describe the purpose of this document and its intended audience.  
-%Mention any prerequisite knowledge required before reading.  
-%Specify whether it targets a technical or non-technical audience.
-The purpose of this document is to present the technical design of a system that enables a robotic arm to learn and perform handwriting tasks in a physical environment for basic sentences using reinforcement learning (RL). \\\\
+
+The purpose of this document is to present the technical design of a robotic arm that can perform handwriting tasks in a physical environment for basic sentences using fine-tuning via reinforcement learning (RL) on a Vision-Language Action model (VLA).
+
 This document is intended for a technical audience with a background in computer science, robotics, or machine learning. Non-technical readers may find high-level summaries useful but should refer to supplementary documentation at the end of this document for background on the underlying mechanisms employed.
 \newpage
 %----------------------------
@@ -210,7 +208,7 @@ We can write each character given their stroke-by-stroke physical definitions, a
 -> done
 \end{verbatim}
 
-The dataset collection and the 
+\includegraphics[width=0.8\textwidth]{assets/vla_data_collection.png}
 
 \subsection{Fine-Tuned VLA Inference}
 
