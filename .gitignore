@@ -1,4 +1,12 @@
-docs/*
-!docs/*.pdf
-!docs/*.tex
-!docs/assets
+docs/**/*.aux
+docs/**/*.log
+docs/**/*.out
+docs/**/*.fls
+docs/**/*.fdb_latexmk
+docs/**/*.synctex.gz
+docs/**/*.toc
+docs/**/*.lof
+docs/**/*.lot
+!docs/*/*.tex
+!docs/*/*.pdf
+!docs/*/assets/**

@@ -1,0 +1,95 @@
+\documentclass[11.5pt,a4paper]{article}
+\usepackage[a4paper,margin=0.65in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{parskip}
+\setlength{\parskip}{0.3em}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\renewcommand{\arraystretch}{1.15}
+\setlist[itemize]{left=0pt, label=--, itemsep=3pt, topsep=3pt}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{7pt}{3pt}
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+  {\huge \textbf{Nimble RX}}\\[6pt]
+  {\normalsize Proposal \quad$\vert$\quad Nimble @ WashU Robotics, Fall 2026}
+\end{center}
+\vspace{4pt}
+
+\section*{Problem}
+Prescription handling is largely manual: pharmacy staff count, label, and verify orders by hand, and patients/caregivers sort weekly medications into organizers, a repetitive, human error-prone task. Nimble RX explores a natural-language-initiated prescription handling pipeline built on Vision-Language-Action (VLA) models to fix the human risk of misplacement.
+
+\section*{Solution}
+\subsection*{Pipeline}
+\begingroup
+\footnotesize
+\begin{verbatim}
+"Put the red prescription in Container A." 
+  -> Whisper STT -> schedule parser (local Qwen LLM)
+  -> [(rx_i, container=i), ...]
+  -> Kokoro TTS read-back confirmation 
+  -> for each (rx, container):
+       -> VLA Inf. #1: pick -> collision check: pass -> continue | fail -> withhold
+       -> VLA Inf. #2: place -> collision check: pass -> continue | fail -> withhold
+       -> YOLO CV model: correctness check -> pass -> done | fail -> withhold
+\end{verbatim}
+\endgroup
+
+\subsection*{Implementation}
+\begin{itemize}
+\item \textbf{Data collection.} LeRobotDataset episodes (instruction, camera frame, 6-DOF grasp/place chunk) per item, initial set comprises 10 episodes/type, scaling toward $\geq$50/type. Isaac Lab may accelerate collection.
+\item \textbf{Safety.} A YOLO CV model checks correct-container placement, serving as a post-placement evaluator and safety outcome predictor.
+\item \textbf{Training.} SFT on NORA 1.5~\cite{nora} via its official fine-tuning script, trained/evaluated per-item to keep the success signal dense. \textit{Stretch:} DPO post-training, pairing successful vs. failed rollouts of the same instruction using CV verdicts as preference labels.
+\end{itemize}
+
+\subsection*{Equipment}
+\vspace{2pt}
+{\normalsize
+\begin{tabular}{@{}ll@{\hspace{2.5em}}ll@{}}
+\toprule
+\textbf{Arm} & WidowX AI Base (6-DOF) & \textbf{Organizer} & Containers for related prescription items \\
+\textbf{Gripper} & WidowX squeeze gripper & \textbf{Items} & 10 3D-printed prescription replicas \\
+\textbf{Cameras} & Intel RealSense D435i & \textbf{Compute} & RoboServer GPU inference \\
+\textbf{Base} & Linear actuator (workspace) & \textbf{Env.} & Fixed, well-lit, curtained safety boundary \\
+\bottomrule
+\end{tabular}
+}
+
+\subsection*{Key Deliverables}
+\begin{itemize}
+\item \textbf{LeRobotDataset} of synchronized frames + user input + grasp/place action chunks, a \textbf{fine-tuned VLA} (NORA 1.5) for prescription pick-and-place, a \textbf{linear actuator} extending the arm's workspace, a \textbf{YOLO CV model} for safety and potentially a DPO reward, finally a \textbf{public release} of dataset, model, metrics, videos, and report on HuggingFace / GitHub.
+\end{itemize}
+
+\section*{Timeline}
+\vspace{2pt}
+{\normalsize
+\begin{tabular}{@{}lp{12.8cm}@{}}
+\toprule
+\textbf{Wks 1--3} & Equipment sourcing (3D printing, ordering), environment setup, RoboServer setup \\
+\textbf{Wks 4--7} & Per-item data collection, dataset build, preprocessing pipeline. \\
+\textbf{Wks 8--10} & Fine-tuning, CV model, safety guardrails. \\
+\textbf{Wks 11--12} & Evals, documentation, public release. \\
+\bottomrule
+\end{tabular}
+}
+
+\section*{Success Metrics}
+\begin{itemize}
+\item \textbf{Per-item success rate:} $\geq$80\%, measured over 5 attempts per item type.
+\item \textbf{Safety effectiveness:} $\geq$80\% of unsafe predicted actions correctly withheld.
+\end{itemize}
+
+{\normalsize
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+\setlength{\itemsep}{4pt}
+\bibitem{nora} Declare Lab. \href{https://huggingface.co/declare-lab/nora-1.5}{\emph{NORA 1.5 Model Card.}} Hugging Face, 2025.
+\end{thebibliography}
+}
+
+\end{document}
