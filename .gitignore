@@ -1,3 +1,4 @@
 docs/*
 !docs/*.pdf
 !docs/*.tex
+!docs/assets
