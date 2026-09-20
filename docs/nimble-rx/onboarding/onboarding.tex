@@ -162,7 +162,11 @@ A long-standing project to enable the robot to move forwards and backwards betwe
 
 \textbf{Resources:}
 \begin{itemize}[nosep]
-    \item stuff here
+    \item Adafruit A4988 breakout guide (wiring, VREF/current-limit trimming, power supply notes): \url{https://learn.adafruit.com/adafruit-a4988-stepper-motor-driver-breakout-board/circuitpython-and-python}
+    \item StepperOnline: connecting a stepper motor to a Raspberry Pi (basic wiring reference): \url{https://help.stepperonline.com/en/article/how-to-connect-stepper-motor-with-raspberry-pi-ibu7oz/}
+    \item A4988 + Raspberry Pi walkthrough with current-limiting and STEP/DIR wiring: \url{https://whatibroke.com/2019/08/10/a4988-stepper-motor-raspberrypi/}
+    \item RpiMotorLib -- Python 3 library with an A4988-specific driver class (handles STEP/DIR/microstepping pins, acceleration ramping): \url{https://github.com/gavinlyonsrepo/RpiMotorLib}
+    \item Controlling stepper motors with Python on a Pi (simpler from-scratch GPIO example, good for understanding what the library abstracts): \url{https://keithweaverca.medium.com/controlling-stepper-motors-using-python-with-a-raspberry-pi-b3fbd482f886}
 \end{itemize}
 
 \subsection{Load Sensor (HX711)}
